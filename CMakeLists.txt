@@ -41,6 +41,7 @@ list(APPEND SRC_FILES
         ${PROJECT_SOURCE_DIR}/media/h265/h265-sps.c
         ${PROJECT_SOURCE_DIR}/media/h265/h265-vps.c
         ${PROJECT_SOURCE_DIR}/media/h265/h265-vui.c
+        ${PROJECT_SOURCE_DIR}/interface.cpp
         )
 #list(APPEND SRC_FILES vDecProc.cpp main.cpp)
 #add_library(${TARGET_NAME} SHARED h264_parser.c)
