@@ -27,8 +27,14 @@ int main(){
     	std::cerr << "Error finding symbol: " << dlerror() << std::endl;
     	return 1;
   	}
+    void (*DestroyH26xParser)(H26xParser *)= (void (*)(H26xParser *))dlsym(handle, "DestroyH26xParser");
+  	if (!DestroyH26xParser) {
+    	std::cerr << "Error finding symbol: " << dlerror() << std::endl;
+    	return 1;
+  	}
 
-    std::shared_ptr<H26xParser> h26xParser=std::shared_ptr<H26xParser>(CreatH26xParser(),[=](H26xParser *h26xParser){ delete h26xParser;});
+
+    std::shared_ptr<H26xParser> h26xParser=std::shared_ptr<H26xParser>(CreatH26xParser(),[=](H26xParser *h26xParser){ DestroyH26xParser(h26xParser);});
     h26xParser->init();
     while (1) {
         if (iFrame_len == 0) {

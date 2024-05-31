@@ -7,12 +7,10 @@
 typedef unsigned char uint8_t;  
 class H26xParser{
     public:
-    H26xParser();
-    virtual ~H26xParser();
-    int getColorRang(u_int8_t *frame,int len);
-    int init();
-    private:
-    h264_parser_t *handle_;
+    H26xParser(){};
+    virtual ~H26xParser(){};
+    virtual int getColorRang(u_int8_t *frame,int len){return -1;};
+    virtual void init(){};
 };
 extern "C"{
 H26xParser *CreatH26xParser();

@@ -1,17 +1,26 @@
 #include "h26xParserInterface.h"
-H26xParser::H26xParser(){
+class H26xParserT:public H26xParser{
+    public:
+    H26xParserT();
+    virtual ~H26xParserT();
+    virtual int getColorRang(u_int8_t *frame,int len) override;
+    virtual void init() override;
+    private:
+    h264_parser_t *handle_;
+};
+H26xParserT::H26xParserT(){
     handle_=nullptr;
 }
-H26xParser::~H26xParser(){
+H26xParserT::~H26xParserT(){
     if(!handle_){
         h264_parser_destroy(handle_);
     }
 }
-int H26xParser::init(){
+void H26xParserT::init(){
     handle_ = h264_parser_create();
 }
 
-int H26xParser::getColorRang(u_int8_t *frame,int len){
+int H26xParserT::getColorRang(u_int8_t *frame,int len){
     h264_parser_input(handle_,frame,len);
     if(handle_->ctx._sps->vui_parameters_present_flag > 0){
             if(handle_->ctx._sps->vui.video_full_range_flag > 0){
@@ -29,9 +38,11 @@ int H26xParser::getColorRang(u_int8_t *frame,int len){
 
 extern "C"{
     H26xParser *CreatH26xParser(){
-        return new H26xParser;
+        return new H26xParserT;
     }
     void DestroyH26xParser(H26xParser *h26xParser){
-        delete h26xParser;
+        H26xParserT *h26xParserT=dynamic_cast<H26xParserT *>(h26xParser);
+        if(!h26xParserT)
+            delete h26xParserT;
     }
 }
