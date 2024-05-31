@@ -1,4 +1,4 @@
-#include "interface.h"
+#include "h26xParserInterface.h"
 H26xParser::H26xParser(){
     handle_=nullptr;
 }

@@ -41,7 +41,7 @@ list(APPEND SRC_FILES
         ${PROJECT_SOURCE_DIR}/media/h265/h265-sps.c
         ${PROJECT_SOURCE_DIR}/media/h265/h265-vps.c
         ${PROJECT_SOURCE_DIR}/media/h265/h265-vui.c
-        ${PROJECT_SOURCE_DIR}/interface.cpp
+        ${PROJECT_SOURCE_DIR}/h26xParserInterface.cpp
         )
 #list(APPEND SRC_FILES vDecProc.cpp main.cpp)
 #add_library(${TARGET_NAME} SHARED h264_parser.c)
@@ -49,7 +49,7 @@ add_library(${TARGET_NAME} SHARED ${SRC_FILES})
 #add_executable(${TARGET_NAME} ${SRC_FILES})
 #add_executable(${TARGET_NAME} ${cpp_files})
 add_executable(main "main.cpp")
-target_link_libraries(main PRIVATE  -lh26xparser)
+target_link_libraries(main PRIVATE  -lh26xparser -ldl)
 #add_executable(test "main.cpp" "ffmpeg_plugin.cpp" "vDecProc.cpp")
 
 #target_link_libraries(${TARGET_NAME} PRIVATE -lavcodec -lavformat -lavutil -lswscale  -lopencv_core -lopencv_highgui  -lopencv_imgproc -lopencv_imgcodecs)

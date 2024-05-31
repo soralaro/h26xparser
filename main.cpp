@@ -1,10 +1,9 @@
-#include "media/h264/h264-util.h"
-#include "media/h264/h264-parser.h"
-#include "media/h265/h265-sps.h"
 #include <string>
 #include "h26X_div.h"
-typedef unsigned char uint8_t;  
-
+#include "h26xParserInterface.h"
+#include <memory>
+#include <iostream>
+#include <dlfcn.h>
 int main(){
      H26X_DIV h26XDiv;
      unsigned int pb_frame_num_=0;
@@ -17,7 +16,20 @@ int main(){
     int iFrame_len = 0;   
     int len = 0;
     int send_len = 0;
+    void* handle = dlopen("libh26xparser.so", RTLD_NOW);
+	 if (!handle) {
+    	std::cerr << "Error loading libh26xparser: " << dlerror() << std::endl;
+    	return 1;
+  	}
+	printf("dlsym!\n");
+	H26xParser*(*CreatH26xParser)() = (H26xParser *(*)())dlsym(handle, "CreatH26xParser");
+  	if (!CreatH26xParser) {
+    	std::cerr << "Error finding symbol: " << dlerror() << std::endl;
+    	return 1;
+  	}
 
+    std::shared_ptr<H26xParser> h26xParser=std::shared_ptr<H26xParser>(CreatH26xParser(),[=](H26xParser *h26xParser){ delete h26xParser;});
+    h26xParser->init();
     while (1) {
         if (iFrame_len == 0) {
             if ((len = h26XDiv.getOneNal(buffer + send_len, CACH_LEN - send_len)) <= 0) {
@@ -52,20 +64,14 @@ int main(){
             i_frame_num_++;
             sn++;
         }
-        h264_parser_t *handle = h264_parser_create();
-        h264_parser_input(handle,buffer,send_len);
-
-        //get stream info such as color range info
-        if(handle->ctx._sps->vui_parameters_present_flag > 0){
-            printf("handle->ctx._sps->vui.video_full_range_flag %d \n",handle->ctx._sps->vui.video_full_range_flag );
-            if(handle->ctx._sps->vui.video_full_range_flag > 0){
-                //color range full
-            }else{
-                //color range limited
-            }
-        }else{
-            //can not parse vui param from h264 stream
+        int colorRang=h26xParser->getColorRang(buffer,send_len);
+        if(colorRang<0){
+            printf("can't get colorange!\n");
+        }else if(colorRang==0){
+            printf("limited color range!\n");
+        }else if(colorRang==1){
+            printf("full color range!\n");
         }
-        h264_parser_destroy(handle);
     }
+    return 0;
 }

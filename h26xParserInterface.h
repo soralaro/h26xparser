@@ -1,5 +1,5 @@
-#ifndef H26XPARSER 
-#define H26XPARSER 
+#ifndef H26XPARSERINTERFACE 
+#define H26XPARSERINTERFACE 
 #include "media/h264/h264-util.h"
 #include "media/h264/h264-parser.h"
 #include "media/h265/h265-sps.h"
@@ -18,5 +18,4 @@ extern "C"{
 H26xParser *CreatH26xParser();
 void DestroyH26xParser(H26xParser *h26xParser);
 }
-
 #endif
