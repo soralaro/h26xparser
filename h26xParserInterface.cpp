@@ -1,4 +1,7 @@
 #include "h26xParserInterface.h"
+#include "media/h264/h264-util.h"
+#include "media/h264/h264-parser.h"
+#include "media/h265/h265-sps.h"
 class H26xParserT:public H26xParser{
     public:
     H26xParserT();
@@ -24,10 +27,10 @@ int H26xParserT::getColorRang(u_int8_t *frame,int len){
     h264_parser_input(handle_,frame,len);
     if(handle_->ctx._sps->vui_parameters_present_flag > 0){
             if(handle_->ctx._sps->vui.video_full_range_flag > 0){
-                return 1;
+                return 2;
                 //color range full
             }else{
-                return 0;
+                return 1;
                 //color range limited
             }
         }else{

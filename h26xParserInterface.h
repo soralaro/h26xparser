@@ -1,8 +1,5 @@
 #ifndef H26XPARSERINTERFACE 
 #define H26XPARSERINTERFACE 
-#include "media/h264/h264-util.h"
-#include "media/h264/h264-parser.h"
-#include "media/h265/h265-sps.h"
 #include <string>
 typedef unsigned char uint8_t;  
 class H26xParser{
