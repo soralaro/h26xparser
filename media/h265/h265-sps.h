@@ -4,7 +4,9 @@
 #include "h265-vps.h"
 #include "h265-vui.h"
 #include <stdint.h>
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 struct h265_sps_t
 {
 	uint8_t sps_video_parameter_set_id; // u(4)
@@ -78,10 +80,11 @@ struct h265_sps_t
 	uint8_t vui_parameters_present_flag; // u(1)
 	struct h265_vui_t vui;
 };
-
 int h265_sps_parse(const void* h265, uint32_t bytes, struct h265_sps_t* sps);
 
 int h265_codec_rect(const struct h265_sps_t* sps, int* x, int *y, int *w, int *h);
 int h265_display_rect(const struct h265_sps_t* sps, int* x, int *y, int *w, int *h);
-
+#ifdef __cplusplus
+}
+#endif
 #endif /* !_h265_sps_h_ */

@@ -22,6 +22,7 @@ int main(){
     	return 1;
   	}
 	printf("dlsym!\n");
+    
 	H26xParser*(*CreatH26xParser)() = (H26xParser *(*)())dlsym(handle, "CreatH26xParser");
   	if (!CreatH26xParser) {
     	std::cerr << "Error finding symbol: " << dlerror() << std::endl;
@@ -35,7 +36,8 @@ int main(){
 
 
     std::shared_ptr<H26xParser> h26xParser=std::shared_ptr<H26xParser>(CreatH26xParser(),[=](H26xParser *h26xParser){ DestroyH26xParser(h26xParser);});
-    h26xParser->init();
+    
+    h26xParser->init(H26xParser::H26x_Type::H264);
     while (1) {
         if (iFrame_len == 0) {
             if ((len = h26XDiv.getOneNal(buffer + send_len, CACH_LEN - send_len)) <= 0) {
@@ -70,7 +72,7 @@ int main(){
             i_frame_num_++;
             sn++;
         }
-        int colorRang=h26xParser->getColorRang(buffer,send_len);
+        int colorRang=h26xParser->getColorRang(buffer,send_len,H26xParser::H26x_Type::H264);
         if(colorRang<0){
             printf("can't get colorange!\n");
         }else if(colorRang==0){

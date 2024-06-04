@@ -6,7 +6,6 @@ int h265_vui(bitstream_t* stream, struct h265_vui_t* vui, int sps_max_sub_layers
 
 static void h265_scaling_list_data(bitstream_t* stream, struct h265_sps_t* sps);
 static void h265_st_ref_pic_set(bitstream_t* stream, struct h265_sps_t* sps, int stRpsIdx);
-
 int h265_sps_parse(const void* h265, uint32_t bytes, struct h265_sps_t* sps)
 {
 	bitstream_t stream;
