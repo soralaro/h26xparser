@@ -16,8 +16,9 @@
 #  define MAX(a,b)  ((a) < (b) ? (b) : (a))
 #endif
 class H26X_DIV {
-        typedef unsigned char uint8_t;     //无符�?8位数
-
+        typedef unsigned char uint8_t;     //无符�?8位数
+#define H264_TYPE 0        
+#define H265_TYPE 1        
 #define NALU_TYPE_SLICE 1
 #define NALU_TYPE_DPA 2
 #define NALU_TYPE_DPB 3
@@ -30,9 +31,17 @@ class H26X_DIV {
 #define NALU_TYPE_EOSEQ 10
 #define NALU_TYPE_EOSTREAM 11
 #define NALU_TYPE_FILL 12
+#define NALU_H265_VPS   0x4001
+#define NALU_H265_SPS   0x4201
+#define NALU_H265_PPS   0x4401
+#define NALU_H265_SEI   0x4e01
+#define NALU_H265_IDR   0x2601
+#define NALU_H265_PB    0x0201
 
 #define CACH_LEN (1024*1024*3)//缓冲区不能设置太小，如果出现比某一帧比缓冲区大，会被覆盖掉一部分
+
     public:
+        enum nalu_type {SLICE,IDR,PB,SPS,PPS,AUD,VPS,SEI};
         H26X_DIV() {
             g_cach[0] = nullptr;
             g_cach[1] = nullptr;
@@ -75,36 +84,76 @@ class H26X_DIV {
         }
 
     public:
-        int checkNal(uint8_t *nal_buf, int len) {
-            uint8_t nalHeader = nal_buf[4];
-            char type = (nalHeader & 0x1f);
-            switch (type) {
+        nalu_type checkNal(uint8_t *nal_buf, int len,int h26x) {
+            nalu_type nal_type = SLICE;
+            if (h26x == H264_TYPE){
+                uint8_t nalHeader = nal_buf[4];
+                char type = (nalHeader & 0x1f);
+                switch (type)
+                {
                 case NALU_TYPE_SPS:
                     SPS_count++;
+                    nal_type =SPS;
                     break;
                 case NALU_TYPE_PPS:
                     PPS_count++;
+                    nal_type =PPS;
                     break;
                 case NALU_TYPE_IDR:
                     I_count++;
+                    nal_type =IDR;
                     break;
                 case NALU_TYPE_SLICE:
                     PB_count++;
+                    nal_type=PB;
                     break;
                 case NALU_TYPE_AUD:
                     AUD_count++;
                     break;
                 case NALU_TYPE_SEI:
+                    nal_type=SEI;
+                    break;
+                default:
+                    printf("nalu type %x\n", type);
+                    break;
+                }
+                if (IsH264KeyFrame(nal_buf, len))
+                {
+                    nal_type = IDR;
+                    I_count++;
+                }
+            }else if(h26x==H265_TYPE){
+                uint16_t nalHeader = nal_buf[4];
+                nalHeader = (nalHeader<<8)+nal_buf[5];
+                switch (nalHeader){
+                case NALU_H265_VPS:
+                    nal_type=VPS;
+                    break;
+                case NALU_H265_IDR:
+                    nal_type=IDR;
+                    I_count++;
+                    break;
+                case NALU_H265_PPS:
+                    nal_type=PPS;
+                    PPS_count++;
+                    break;
+                case NALU_H265_SPS:
+                    nal_type=SPS;
+                    SPS_count++;
+                    break;
+                case NALU_H265_PB:
+                    nal_type=PB;
+                    PB_count++;
+                    break;
+                case NALU_H265_SEI:
+                    nal_type=SEI;
+                    PB_count++;
                     break;
                 default:
                     break;
+                }
             }
-            if (IsH264KeyFrame(nal_buf, len)) {
-                type = NALU_TYPE_IDR;
-                I_count++;
-            }
-
-            return type;
+            return nal_type;
         }
 
 
@@ -151,7 +200,7 @@ class H26X_DIV {
         }
 
 
-//获取一个Nal�? buf, bufLen表示缓冲区最大可以容纳的数据
+//获取一个Nal�? buf, bufLen表示缓冲区最大可以容纳的数据
 //返回实际的帧数据长度
         int getOneNal(uint8_t *buf, int bufLen) {
             int i = 0;

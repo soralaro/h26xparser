@@ -4,7 +4,7 @@
 typedef unsigned char uint8_t;  
 class H26xParser{
     public:
-    enum H26x_Type{H264,h265};
+    enum H26x_Type{None,H264,H265};
     H26xParser(){};
     virtual ~H26xParser(){};
     virtual int getColorRang(const u_int8_t *frame,int len,H26x_Type type){return -1;};

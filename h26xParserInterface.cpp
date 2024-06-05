@@ -27,7 +27,7 @@ void H26xParserT::init(H26x_Type type){
 }
 
 int H26xParserT::getColorRang(const u_int8_t *frame,int len,H26x_Type type){
-    if(type==H26x_Type::h265){
+    if(type==H26x_Type::H265){
         const uint8_t *startCode = h264_startcode(frame,len);
         if(!startCode){
             //can not find h265 nalu
@@ -63,7 +63,7 @@ int H26xParserT::getColorRang(const u_int8_t *frame,int len,H26x_Type type){
             startCode = h264_startcode(frame,len);
         }
         return -1;
-    }else{
+    }else if(type==H26x_Type::H264){
         h264_parser_input(handle_,frame,len);
         if(handle_->ctx._sps->vui_parameters_present_flag > 0){
             if(handle_->ctx._sps->vui.video_full_range_flag > 0){
@@ -78,6 +78,7 @@ int H26xParserT::getColorRang(const u_int8_t *frame,int len,H26x_Type type){
             //can not parse vui param from h264 stream
         }
     }
+    return -1;
 }
 
 extern "C"{
